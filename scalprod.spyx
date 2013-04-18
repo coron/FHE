@@ -20,7 +20,7 @@ def directProd(c,y,kap):
   cdef sage.rings.integer.Integer cz=<sage.rings.integer.Integer>c
   return ZZ(directScal(kap, cz.value, yz.value)) >> (getGMP_NUMB_BITS()-32)
 
-from libc.stdlib cimport calloc
+from libc.stdlib cimport calloc, free
 from sage.all import ZZ
 
 def partialProd(c,y,kap):
