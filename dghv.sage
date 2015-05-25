@@ -50,6 +50,71 @@ class Pk(object):
   def __repr__(self):
     return "<Pk with rho=%d, eta=%d, gam=%d>" % (self.rho,self.eta,self.gam) 
 
+  def addInt(self,c1,c2):
+    int_c1 = bin(c1)
+    int_c2 = bin(c2)
+
+    int_c1 = int_c1[2:len(int_c1)]
+    int_c2 = int_c2[2:len(int_c2)]
+      
+    eint_c1 = [self.encrypt(int(i)) for i in int_c1]
+    eint_c2 = [self.encrypt(int(j)) for j in int_c2]
+
+    result = self.addEnc(eint_c1,eint_c2)
+    return result
+
+  def decrypt_List(self, result):
+    result = [self.decrypt(i) for i in result]
+    result = [str(i) for i in result]
+    return ''.join(result) + " = " + "%d" % int(''.join(result),2)
+
+  def addEnc(self,eint_c1,eint_c2):
+    if len(eint_c1) > len(eint_c2):
+      for i in range(len(eint_c1) - len(eint_c2)): 
+        eint_c2.insert(0,0)
+    if len(eint_c1) < len(eint_c2):
+      for i in range(len(eint_c2) - len(eint_c1)): 
+        eint_c1.insert(0,0)
+
+    eint_c1.reverse()
+    eint_c2.reverse()
+
+    carry_bit = 0
+    result = []
+    for i in range(len(eint_c1)):
+
+      mul_bit1 = eint_c1[i] * eint_c2[i]
+      mul_bit2 = eint_c1[i] * carry_bit
+      mul_bit3 = eint_c2[i] * carry_bit
+
+      add_bit = eint_c1[i] + eint_c2[i] + carry_bit
+      carry_bit = mul_bit1 + mul_bit2 + mul_bit3
+
+      result.insert(0,add_bit)
+    
+    result.insert(0,carry_bit)
+    return result    
+
+  def mulInt(self,c1,c2):
+    int_c1 = bin(c1)
+    int_c2 = bin(c2)
+
+    int_c1 = int_c1[2:len(int_c1)]
+    int_c2 = int_c2[2:len(int_c2)]
+      
+    eint_c1 = [self.encrypt(int(i)) for i in int_c1]
+    eint_c2 = [self.encrypt(int(j)) for j in int_c2]
+    
+    eint_c1.reverse()
+    
+    result = []
+    for i in range(len(eint_c1)):
+      if i > 0: eint_c2.append(0)
+      par_res = [eint_c1[i] * eint_c2[j] for j in range(len(eint_c2))]
+      result = self.addEnc(par_res,result)
+ 
+    return result   
+      
 class Ciphertext():
   def __init__(self,val_,pk_,degree_=1):
     self.val,self.pk,self.degree=val_,pk_,degree_
